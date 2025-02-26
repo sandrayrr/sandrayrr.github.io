@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kehadiran Saur Saur</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #eaf5ea;
+            text-align: center;
+        }
+        .container {
+            background: white;
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+        }
+        h1 {
+            background: black;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        input {
+            width: 90%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .btn {
+            padding: 10px;
+            border: none;
+            color: white;
+            cursor: pointer;
+            margin: 5px;
+            border-radius: 5px;
+        }
+        .btn.hadir { background: blue; }
+        .btn.reset { background: red; }
+        .btn.hapus { background: darkred; }
+        table {
+            width: 100%;
+            margin-top: 10px;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+        }
+        th {
+            background: black;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>KEHADIRAN SAUR SAUR</h1>
+    <p>Nama</p>
+    <input type="text" id="nama" placeholder="Masukkan Nama">
+    <br>
+    <button class="btn hadir" onclick="tandaiHadir()">Hadir</button>
+    <button class="btn reset" onclick="resetInput()">Reset</button>
+    <button class="btn hapus" onclick="hapusSemua()">Hapus Semua</button>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Nama</th>
+                <th>Poin</th>
+                <th>Waktu Kehadiran</th>
+            </tr>
+        </thead>
+        <tbody id="tabel-konten"></tbody>
+    </table>
+</div>
+
+<script>
+    function tandaiHadir() {
+        let nama = document.getElementById("nama").value.trim();
+        if (nama === "") {
+            alert("Masukkan nama terlebih dahulu!");
+            return;
+        }
+
+        let data = JSON.parse(localStorage.getItem("kehadiran")) || [];
+        let waktu = new Date().toLocaleString();
+
+        let index = data.findIndex(item => item.nama === nama);
+        if (index !== -1) {
+            data[index].poin += 1;
+            data[index].waktu = waktu;
+        } else {
+            data.push({ nama, poin: 1, waktu });
+        }
+
+        localStorage.setItem("kehadiran", JSON.stringify(data));
+        tampilkanData();
+    }
+
+    function resetInput() {
+        document.getElementById("nama").value = "";
+    }
+
+    function hapusSemua() {
+        if (confirm("Yakin ingin menghapus semua data?")) {
+            localStorage.removeItem("kehadiran");
+            tampilkanData();
+        }
+    }
+
+    function tampilkanData() {
+        let data = JSON.parse(localStorage.getItem("kehadiran")) || [];
+        let tabel = document.getElementById("tabel-konten");
+        tabel.innerHTML = "";
+
+        data.forEach(item => {
+            let row = `<tr>
+                        <td>${item.nama}</td>
+                        <td>${item.poin}</td>
+                        <td>${item.waktu}</td>
+                       </tr>`;
+            tabel.innerHTML += row;
+        });
+    }
+
+    window.onload = tampilkanData;
+</script>
+
+</body>
+</html>
